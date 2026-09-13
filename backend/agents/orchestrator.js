@@ -38,7 +38,28 @@ async function runPipeline(state, io, disasterType=null, logFn) {
 
   // 3 Communication
   await new Promise(r=>setTimeout(r,600));
-  const alerts = ['en','hi','mr'].map(l=>communication.composeAlert(incident,l));
+  const supportedLanguages = [
+  'en',
+  'hi',
+  'mr',
+  'ta',
+  'te',
+  'bn',
+  'gu',
+  'kn',
+  'ml',
+  'pa'
+];
+
+const alerts =
+  supportedLanguages.map(
+    language =>
+      communication.composeAlert(
+        incident,
+        language
+      )
+  );
+  
   alerts.forEach(a=>state.alerts.unshift(a));
   io && io.emit('alerts:new', alerts);
   log('COMMUNICATION', `Multilingual alerts broadcast in 3 languages via App/SMS/Siren`, alerts);
