@@ -1,25 +1,142 @@
+function calculateDistanceKm(
+  lat1,
+  lon1,
+  lat2,
+  lon2
+) {
+  const R = 6371;
 
-function allocate(incident, state) {
-  // Find nearest 3 open shelters
-  const openShelters = state.shelters.filter(s => s.status === 'open')
-    .map(s => {
-      const dist = Math.sqrt(Math.pow(s.lat-incident.lat,2)+Math.pow(s.lng-incident.lng,2))*111;
-      return {...s, distanceKm: parseFloat(dist.toFixed(2))};
-    })
-    .sort((a,b)=>a.distanceKm-b.distanceKm)
-    .slice(0,3);
+  const dLat =
+    (
+      (lat2 - lat1) *
+      Math.PI
+    ) / 180;
 
-  const availableTeams = state.teams.filter(t=>t.status==='standby').slice(0,2);
-  availableTeams.forEach(t=>t.assignedTo=incident.incidentId);
+  const dLon =
+    (
+      (lon2 - lon1) *
+      Math.PI
+    ) / 180;
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) ** 2;
+
+  return (
+    2 *
+    R *
+    Math.asin(
+      Math.sqrt(a)
+    )
+  );
+}
+
+function allocate(
+  incident,
+  state
+) {
+
+  const openShelters =
+    state.shelters
+      .filter(
+        shelter =>
+          shelter.status === 'open'
+      )
+      .map(shelter => {
+
+        const distance =
+          calculateDistanceKm(
+            incident.lat,
+            incident.lng,
+            shelter.lat,
+            shelter.lng
+          );
+
+        return {
+          ...shelter,
+          distanceKm:
+            Number(
+              distance.toFixed(2)
+            )
+        };
+      })
+      .sort(
+        (a, b) =>
+          a.distanceKm -
+          b.distanceKm
+      )
+      .slice(0, 3);
+
+  const availableTeams =
+    state.teams
+      .filter(
+        team =>
+          team.status === 'standby'
+      )
+      .slice(0, 2);
+
+  availableTeams.forEach(team => {
+
+    team.status = 'deployed';
+
+    team.assignedTo =
+      incident.incidentId;
+
+    team.lastDeployment =
+      new Date().toISOString();
+  });
 
   return {
-    shelters: openShelters,
-    teams: availableTeams,
-    safeZones: openShelters.map(s=>({name:s.name, lat:s.lat, lng:s.lng, distance:s.distanceKm})),
+
+    shelters:
+      openShelters,
+
+    teams:
+      availableTeams,
+
+    safeZones:
+      openShelters.map(
+        shelter => ({
+          name:
+            shelter.name,
+          lat:
+            shelter.lat,
+          lng:
+            shelter.lng,
+          distance:
+            shelter.distanceKm
+        })
+      ),
+
     evacuationRoutes: [
-      `Primary route to ${openShelters[0]?.name || 'Shelter'} - ${openShelters[0]?.distanceKm || 2}km`,
-      `Secondary route via NH48 - ${((openShelters[1]?.distanceKm||3)+1)}km`
+      {
+        type: 'estimated',
+        label:
+          `Nearest shelter: ${
+            openShelters[0]?.name ||
+            'No shelter available'
+          }`,
+        distanceKm:
+          openShelters[0]?.distanceKm ??
+          null
+      },
+      {
+        type: 'estimated',
+        label:
+          `Second nearest shelter: ${
+            openShelters[1]?.name ||
+            'Unavailable'
+          }`,
+        distanceKm:
+          openShelters[1]?.distanceKm ??
+          null
+      }
     ]
   };
 }
-module.exports = { allocate };
+
+module.exports = {
+  allocate
+};
