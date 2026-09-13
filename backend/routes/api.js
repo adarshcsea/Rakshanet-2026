@@ -7,22 +7,22 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dev-only-change-this-secret';
 
 const USERS = {
   admin: {
-    username: 'admin',
-    password: 'demo123',
+    username: 'Dheksha',
+    password: 'Dheksha@1',
     role: 'admin',
-    name: 'District Collector'
+    name: 'Dheksha'
   },
   citizen: {
-    username: 'citizen',
-    password: 'demo123',
+    username: 'Chandra Prakash',
+    password: 'Chandraprakash@1',
     role: 'citizen',
-    name: 'Om Prakash'
+    name: 'Chandra Prakash'
   },
   ndrf: {
-    username: 'ndrf',
-    password: 'demo123',
-    role: 'admin',
-    name: 'NDRF Commander'
+    username: 'Adarsh',
+    password: 'Adarsh@1',
+    role: 'Root Admin',
+    name: 'Adarsh Rai'
   }
 };
 
