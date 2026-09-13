@@ -128,12 +128,48 @@ socket.on('system:reset', ()=>{ document.getElementById('logStream').innerHTML='
 
 async function simulate(type){
  logEntry({agent:'ORCHESTRATOR', message:`Triggering ${type} simulation...`, time:new Date().toLocaleTimeString()});
- const res=await fetch('/api/simulate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type})});
+ const res = await fetch(
+  '/api/simulate',
+  {
+    method: 'POST',
+    headers: {
+      'Content-Type':
+        'application/json',
+      'Authorization':
+        `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      type
+    })
+  }
+);
+
+if (res.status === 401 ||
+    res.status === 403) {
+
+  localStorage.removeItem(
+    'rakshanet_token'
+  );
+
+  location.href =
+    'login.html?role=admin';
+
+  return;
+}
  const data=await res.json();
  refresh();
 }
-async function resetDemo(){ await fetch('/api/reset',{method:'POST'}); refresh(); }
-
+async function resetDemo(){ 
+ await fetch(
+  '/api/reset',
+  {
+    method: 'POST',
+    headers: {
+      'Authorization':
+        `Bearer ${token}`
+    }
+  }
+);
 refresh();
 </script>
 </body></html>
