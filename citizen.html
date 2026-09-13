@@ -109,13 +109,70 @@ socket.on('checkin:new', c=>{
  document.getElementById('checkinList').innerHTML=`<div>✅ ${c.name} - ${c.status} at ${new Date(c.time).toLocaleTimeString()}</div>`+document.getElementById('checkinList').innerHTML;
 });
 
-document.getElementById('checkinBtn').onclick=async()=>{
- const name=document.getElementById('cName').value||user.name||'Anonymous';
- const status=document.getElementById('cStatus').value;
- const body={name, status, lat:19.076, lng:72.8777, time:new Date()};
- await fetch('/api/checkin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
- socket.emit('citizen:checkin', body);
- document.getElementById('checkinList').innerHTML=`<div>✅ You checked in as ${status}</div>`+document.getElementById('checkinList').innerHTML;
+document.getElementById('checkinBtn').onclick = async () => {
+  const button = document.getElementById('checkinBtn');
+  const status = document.getElementById('cStatus').value;
+
+  button.disabled = true;
+  button.textContent = 'Locating...';
+
+  try {
+    const position = await new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error('Geolocation is not supported'));
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 30000
+      });
+    });
+
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+
+    button.textContent = 'Sending...';
+
+    const token = localStorage.getItem('rakshanet_token');
+
+    if (!token) {
+      location.href = 'login.html';
+      return;
+    }
+
+    const response = await fetch('/api/checkin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        lat,
+        lng,
+        status
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Check-in failed');
+    }
+
+    button.textContent = 'Checked In ✓';
+
+    setTimeout(() => {
+      button.textContent = 'Send ✓';
+      button.disabled = false;
+    }, 1500);
+
+  } catch (error) {
+    console.error('Check-in error:', error);
+    alert('Could not submit check-in. ' + error.message);
+    button.textContent = 'Send ✓';
+    button.disabled = false;
+  }
 };
 
 loadData();
