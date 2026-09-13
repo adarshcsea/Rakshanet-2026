@@ -58,6 +58,26 @@
 </div>
 
 <script>
+
+ const token =
+  localStorage.getItem('rakshanet_token');
+
+const user =
+  JSON.parse(
+    localStorage.getItem(
+      'rakshanet_user'
+    ) || 'null'
+  );
+
+if (
+  !token ||
+  !user ||
+  user.role !== 'admin'
+) {
+  location.href =
+    'login.html?role=admin';
+}
+ 
 const socket=io();
 const user=JSON.parse(localStorage.getItem('rakshanet_user')||'{"name":"Admin"}');
 document.getElementById('adminName').textContent=user.name;
