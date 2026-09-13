@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Citizen • RakshaNet Disaster Safety Hub</title>
 
-  <!-- Network & Resource Hints for Instant Handshakes -->
+  <!-- Preconnect to CDNs & Map Tile Edge Servers -->
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="dns-prefetch" href="https://unpkg.com">
   <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
@@ -13,23 +13,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Leaflet CSS -->
-  <link rel="preload" as="style" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <!-- Leaflet CSS loaded immediately -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
-  <!-- Deferred Scripts -->
-  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- Core Scripts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script defer src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
-  <!-- Non-Blocking Google Fonts -->
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500&display=swap">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500&display=swap" media="print" onload="this.media='all'">
-  <noscript>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500&display=swap">
-  </noscript>
+  <!-- High Performance Fonts with display=swap -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500&display=swap">
 
   <style>
     * { 
@@ -41,13 +34,14 @@
       font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif; 
     }
     .font-mono { 
-      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace; 
+      font-family: 'JetBrains Mono', ui-monospace, monospace; 
     }
     
+    /* Strict layout containment prevents CLS & render delays */
     #map {
       height: 380px;
       width: 100%;
-      background: #e5e7eb;
+      background: #e4e7eb;
       contain: layout paint;
     }
     @media (min-width: 640px) { #map { height: 460px; } }
@@ -56,11 +50,21 @@
     .leaflet-pane { z-index: 10 !important; }
     .leaflet-bottom, .leaflet-top { z-index: 20 !important; }
     .leaflet-tile { will-change: transform, opacity; }
+    
+    /* Smooth Pulse Animation for Preset and User Markers */
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.35); opacity: 0.2; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-ring {
+      animation: pulse-ring 2s infinite ease-in-out;
+    }
   </style>
 </head>
 <body class="bg-[#f7f7f5] text-zinc-900 min-h-screen flex flex-col justify-between antialiased selection:bg-zinc-900 selection:text-white">
 
-  <!-- Top Header Navigation -->
+  <!-- Top Navigation -->
   <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-zinc-200/80 px-4 sm:px-6 lg:px-8 py-3">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
       <div class="flex items-center gap-2.5">
@@ -76,7 +80,7 @@
       </div>
       
       <div class="flex items-center gap-2 sm:gap-3">
-        <div class="flex items-center gap-1.5 bg-zinc-100/80 border border-zinc-200 px-2.5 py-1 rounded-full text-xs font-medium text-zinc-700">
+        <div class="flex items-center gap-1.5 bg-zinc-100 border border-zinc-200 px-2.5 py-1 rounded-full text-xs font-medium text-zinc-700">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span id="userName">Citizen</span>
         </div>
@@ -87,8 +91,8 @@
     </div>
   </nav>
 
-  <!-- Dynamic Emergency Alert Banner -->
-  <div id="alertBanner" class="hidden max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 mt-4 transition-all duration-300">
+  <!-- Emergency Alert Banner -->
+  <div id="alertBanner" class="hidden max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 mt-4 transition-all">
     <div class="p-4 rounded-2xl bg-red-600 text-white shadow-lg flex items-start justify-between gap-3">
       <div class="flex items-start gap-3">
         <span class="text-2xl leading-none">🚨</span>
@@ -114,8 +118,13 @@
         <div class="rounded-3xl overflow-hidden bg-white border border-zinc-200/90 shadow-sm flex flex-col">
           <div class="p-4 sm:p-5 flex flex-wrap justify-between items-center gap-2 border-b border-zinc-100">
             <div>
-              <h2 class="font-bold text-base sm:text-lg text-zinc-900">Live Safety & Shelter Map</h2>
-              <p class="text-xs text-zinc-500">Real-time GPS proximity, safe havens & rescue zones</p>
+              <div class="flex items-center gap-2">
+                <h2 class="font-bold text-base sm:text-lg text-zinc-900">Live Safety & Shelter Map</h2>
+                <span id="locStatusBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 font-semibold">
+                  📍 Preset: Central HQ
+                </span>
+              </div>
+              <p class="text-xs text-zinc-500 mt-0.5" id="locStatusSubtext">Showing Central Command Hub (GPS idle)</p>
             </div>
             <select id="langSel" class="text-xs font-medium border border-zinc-200 rounded-xl px-2.5 py-1.5 bg-zinc-50 text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-900">
               <option value="en">English</option>
@@ -125,11 +134,12 @@
           </div>
 
           <!-- The Map Viewport -->
-          <div class="relative w-full bg-zinc-100">
+          <div class="relative w-full bg-zinc-200">
             <div id="map"></div>
+            
             <!-- Geolocation Floating Button -->
-            <button id="locateMeBtn" title="Center to My Location" class="absolute bottom-4 right-4 z-30 bg-white border border-zinc-300 text-zinc-800 p-2.5 rounded-xl shadow-md hover:bg-zinc-50 active:scale-95 transition flex items-center justify-center">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06z"/></svg>
+            <button id="locateMeBtn" title="Detect and Center My GPS Location" class="absolute bottom-4 right-4 z-30 bg-white border border-zinc-300 text-zinc-800 p-2.5 rounded-xl shadow-md hover:bg-zinc-50 active:scale-95 transition flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06z"/></svg>
             </button>
           </div>
 
@@ -139,21 +149,21 @@
               <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Open Shelter
             </span>
             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200">
-              <span class="w-2 h-2 rounded-full bg-rose-500"></span> Hazard Boundary
+              <span class="w-2 h-2 rounded-full bg-rose-500"></span> Hazard Zone
             </span>
             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-800 border border-blue-200">
-              <span class="w-2 h-2 rounded-full bg-blue-500"></span> NDRF Response Unit
+              <span class="w-2 h-2 rounded-full bg-blue-500"></span> NDRF Unit
             </span>
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-100 text-blue-900 border border-blue-300">
-              <span class="w-2 h-2 rounded-full bg-blue-600"></span> Your Location
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-800 border border-indigo-200">
+              <span class="w-2 h-2 rounded-full bg-indigo-600"></span> Anchor / Location
             </span>
           </div>
         </div>
 
         <!-- I'm Safe Check-in Card -->
         <div class="rounded-3xl bg-white border border-zinc-200/90 p-5 sm:p-6 shadow-sm">
-          <h3 class="font-bold text-base sm:text-lg text-zinc-900">Family & Civil "I'm Safe" Check-in</h3>
-          <p class="text-xs text-zinc-500 mt-0.5">Publish your safety verification with automatic GPS coordinates</p>
+          <h3 class="font-bold text-base sm:text-lg text-zinc-900">Civil "I'm Safe" Check-in</h3>
+          <p class="text-xs text-zinc-500 mt-0.5">Publish your safety status with automatic coordinates</p>
           
           <div class="mt-4 grid grid-cols-1 sm:grid-cols-12 gap-2.5">
             <input id="cName" placeholder="Your name" class="sm:col-span-5 px-3.5 py-2.5 rounded-xl border border-zinc-200 bg-zinc-50 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900">
@@ -167,13 +177,12 @@
             </button>
           </div>
           
-          <div id="checkinList" class="mt-4 space-y-1.5 max-h-36 overflow-y-auto font-mono text-xs text-zinc-700 divide-y divide-zinc-100">
-          </div>
+          <div id="checkinList" class="mt-4 space-y-1.5 max-h-36 overflow-y-auto font-mono text-xs text-zinc-700 divide-y divide-zinc-100"></div>
         </div>
 
       </div>
 
-      <!-- Right Column: Safe Shelters, Alerts & Tips -->
+      <!-- Right Column: Shelters, Alerts & Survival Tips -->
       <div class="lg:col-span-5 space-y-5 sm:space-y-6">
         
         <!-- Shelters Card -->
@@ -182,18 +191,16 @@
             <h3 class="font-bold text-base sm:text-lg">Nearest Safe Places</h3>
             <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-800/40">Verified Active</span>
           </div>
-          <div id="shelterList" class="mt-4 space-y-2.5">
-          </div>
+          <div id="shelterList" class="mt-4 space-y-2.5"></div>
         </div>
 
-        <!-- Alert History -->
+        <!-- Alert Stream -->
         <div class="rounded-3xl bg-white border border-zinc-200/90 p-5 sm:p-6 shadow-sm">
           <h3 class="font-bold text-base sm:text-lg text-zinc-900">Official Alert Stream</h3>
-          <div id="alertHistory" class="mt-3 space-y-2.5 max-h-[260px] overflow-y-auto pr-1">
-          </div>
+          <div id="alertHistory" class="mt-3 space-y-2.5 max-h-[260px] overflow-y-auto pr-1"></div>
         </div>
 
-        <!-- Quick Preparedness Tips -->
+        <!-- Survival Tips -->
         <div class="rounded-3xl bg-amber-50/90 border border-amber-200/80 p-5 sm:p-6">
           <h3 class="font-bold text-amber-950 text-sm sm:text-base flex items-center gap-1.5">
             <span>🛡️</span> Immediate Survival Guidelines
@@ -217,14 +224,23 @@
     RakshaNet Civil Safety Infrastructure • Updated in real-time across regional sensor arrays
   </footer>
 
-  <!-- Main Application Logic -->
+  <!-- Application Execution Core -->
   <script>
-    // 1. User session state & default fallback data
+    // 1. Preset Address Configuration (Loaded immediately if GPS is rejected/offline/pending)
+    const PRESET_LOCATION = {
+      name: "Central Disaster Command Hub",
+      address: "BKC Emergency Operations Center, Mumbai",
+      lat: 19.0657,
+      lng: 72.8687,
+      zoom: 13
+    };
+
     const user = JSON.parse(localStorage.getItem('rakshanet_user') || '{"name":"Citizen"}');
     document.getElementById('userName').textContent = user.name || user.username || 'Citizen';
     const cNameInput = document.getElementById('cName');
     if (cNameInput) cNameInput.value = user.name || '';
 
+    // In-memory dataset rendered instantly before network requests
     const defaultShelters = [
       { id: "s1", name: "Dharavi Municipal Transit Hub", lat: 19.0430, lng: 72.8550, capacity: 600, occupied: 140, status: "open", facilities: ["Medical", "Food", "Clean Water"], distanceKm: "1.2" },
       { id: "s2", name: "Bandra Kurla Disaster Relief Center", lat: 19.0665, lng: 72.8680, capacity: 1200, occupied: 410, status: "open", facilities: ["Shelter", "Doctor", "Generators"], distanceKm: "2.4" },
@@ -283,30 +299,26 @@
       }
     }
 
-    // 2. Leaflet Map Setup
+    // 2. Immediate Leaflet Initialization (No polling delay, Preset Location Loaded Instantly)
     let map = null;
     let shelterLayer = null;
     let hazardLayer = null;
     let teamLayer = null;
     let userMarker = null;
+    let presetMarker = null;
 
-    function initMapWhenReady() {
-      if (typeof L === 'undefined') {
-        setTimeout(initMapWhenReady, 50);
-        return;
-      }
-
+    function initMap() {
+      // 1. Instantly set view to PRESET coordinates so the map is never blank
       map = L.map('map', {
         zoomControl: true,
         preferCanvas: true,
-        fadeAnimation: true,
-        markerZoomAnimation: true
-      }).setView([19.065, 72.865], 12);
+        fadeAnimation: true
+      }).setView([PRESET_LOCATION.lat, PRESET_LOCATION.lng], PRESET_LOCATION.zoom);
 
+      // Fast CDN Raster Tiles
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
+        maxZoom: 19,
         updateWhenIdle: true,
-        keepBuffer: 2,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
       }).addTo(map);
 
@@ -314,6 +326,17 @@
       hazardLayer = L.layerGroup().addTo(map);
       teamLayer = L.layerGroup().addTo(map);
 
+      // Plot the Preset Location Marker immediately
+      presetMarker = L.circleMarker([PRESET_LOCATION.lat, PRESET_LOCATION.lng], {
+        radius: 9,
+        color: '#4f46e5',
+        fillColor: '#6366f1',
+        fillOpacity: 0.9,
+        weight: 3
+      }).addTo(map)
+        .bindPopup(`<b>${PRESET_LOCATION.name}</b><br><small style="color:#6b7280">${PRESET_LOCATION.address}</small><br><span style="font-size:10px; color:#4f46e5;">(Default Preset Location)</span>`);
+
+      // Plot default Shelters & Hazard Buffer
       plotSheltersOnMap(defaultShelters);
       L.circle([19.0728, 72.8710], {
         radius: 3500,
@@ -322,20 +345,19 @@
         fillOpacity: 0.15
       }).addTo(hazardLayer).bindPopup('<b>Active Hazard Zone</b>: Mithi River Flood Basin');
 
-      if (window.ResizeObserver) {
-        new ResizeObserver(() => map.invalidateSize()).observe(document.getElementById('map'));
-      } else {
-        requestAnimationFrame(() => map.invalidateSize());
-      }
+      // Guarantee proper tile layout on all device sizes
+      setTimeout(() => { if (map) map.invalidateSize(); }, 200);
+      window.addEventListener('resize', () => { if (map) map.invalidateSize(); });
 
+      // Begin background non-blocking tasks
       revalidateNetworkData();
       initBackgroundSocket();
     }
 
-    // 3. User Geolocation Handler & Initial Trigger
+    // 3. User Geolocation with Fallback Preservation
     function locateUser() {
       if (!navigator.geolocation) {
-        console.warn('Geolocation not supported');
+        console.warn('Geolocation not supported; maintaining preset location.');
         return;
       }
 
@@ -346,44 +368,60 @@
 
           if (!map) return;
 
+          // Pan smoothly to user coordinates
           map.setView([lat, lng], 14);
 
+          // Update Status UI
+          const badge = document.getElementById('locStatusBadge');
+          const subtext = document.getElementById('locStatusSubtext');
+          if (badge) {
+            badge.textContent = '📍 GPS: Locked';
+            badge.className = 'text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold';
+          }
+          if (subtext) {
+            subtext.textContent = 'Showing real-time location telemetry';
+          }
+
+          // Render or Update User GPS Pin
           if (userMarker) {
             userMarker.setLatLng([lat, lng]);
           } else {
-            userMarker = L.circleMarker(
-              [lat, lng],
-              {
-                radius: 9,
-                color: '#2563eb',
-                fillColor: '#2563eb',
-                fillOpacity: 0.9,
-                weight: 3
-              }
-            )
-              .addTo(map)
+            userMarker = L.circleMarker([lat, lng], {
+              radius: 9,
+              color: '#2563eb',
+              fillColor: '#3b82f6',
+              fillOpacity: 0.9,
+              weight: 3
+            }).addTo(map)
               .bindPopup('<b>Your current location</b>')
               .openPopup();
           }
         },
 
         error => {
-          console.warn(
-            'Could not get user location:',
-            error.message
-          );
+          // Graceful handling: Preset location remains active and visible
+          console.warn('GPS unavailable or rejected:', error.message);
+          const subtext = document.getElementById('locStatusSubtext');
+          if (subtext) {
+            subtext.textContent = 'GPS permission denied or timed out. Default address preserved.';
+          }
         },
 
         {
           enableHighAccuracy: true,
-          timeout: 10000,
+          timeout: 7000,
           maximumAge: 60000
         }
       );
     }
 
+    // Initialize Map directly
+    initMap();
+
+    // Trigger locateUser right after setup
     setTimeout(locateUser, 500);
 
+    // Bind Locate Me button
     const locateMeBtn = document.getElementById('locateMeBtn');
     if (locateMeBtn) {
       locateMeBtn.addEventListener('click', locateUser);
@@ -413,7 +451,7 @@
       });
     }
 
-    // 4. Background Data Sync
+    // 4. Background Network Revalidation
     async function revalidateNetworkData() {
       try {
         const [sRes, aRes] = await Promise.allSettled([
@@ -438,13 +476,13 @@
       } catch (e) {}
     }
 
-    // 5. Real-Time Socket Interop
+    // 5. Background Real-time Socket
     function initBackgroundSocket() {
       if (typeof io === 'undefined') return;
       try {
         const socket = io({
           transports: ['websocket', 'polling'],
-          timeout: 5000,
+          timeout: 4000,
           reconnectionAttempts: 2
         });
 
@@ -465,7 +503,7 @@
             fillColor: '#ef4444',
             fillOpacity: 0.2
           }).addTo(hazardLayer);
-          L.marker([h.lat, h.lng]).addTo(hazardLayer).bindPopup(`<b>${(h.type || '').toUpperCase()}</b><br/>${h.location || 'Reported Zone'}`).openPopup();
+          L.marker([h.lat, h.lng]).addTo(hazardLayer).bindPopup(`<b>${(h.type || '').toUpperCase()}</b><br/>${h.location || 'Reported Hazard Area'}`).openPopup();
         });
 
         socket.on('resource:allocated', (res) => {
@@ -494,10 +532,12 @@
       button.disabled = true;
       button.textContent = 'Sending...';
 
-      let lat = 19.0760, lng = 72.8777;
+      let lat = PRESET_LOCATION.lat;
+      let lng = PRESET_LOCATION.lng;
+
       if (navigator.geolocation) {
         try {
-          const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { timeout: 4000 }));
+          const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { timeout: 3000 }));
           lat = pos.coords.latitude;
           lng = pos.coords.longitude;
         } catch (_) {}
@@ -520,12 +560,6 @@
         button.disabled = false;
       }, 1500);
     };
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initMapWhenReady);
-    } else {
-      initMapWhenReady();
-    }
   </script>
 </body>
 </html>
