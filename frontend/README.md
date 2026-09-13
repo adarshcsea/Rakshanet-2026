@@ -1,2 +1,0 @@
-hi
-Adarsh is great
