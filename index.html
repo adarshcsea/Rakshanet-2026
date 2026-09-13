@@ -1,264 +1,307 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>RakshaNet • Autonomous Multi-Agent Disaster Response Engine</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
     h1, h2, h3, .font-heading { font-family: 'Space Grotesk', sans-serif; }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
-    .glass { backdrop-filter: blur(16px); background: rgba(255, 255, 255, 0.75); }
-    .glass-dark { backdrop-filter: blur(16px); background: rgba(18, 18, 23, 0.85); }
+    .glass { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); background: rgba(255, 255, 255, 0.82); }
+    .glass-dark { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); background: rgba(18, 18, 23, 0.88); }
     .mesh {
-      background: radial-gradient(at 15% 20%, #ef444430 0, transparent 45%),
-                  radial-gradient(at 85% 15%, #06b6d430 0, transparent 45%),
-                  radial-gradient(at 50% 85%, #eab30825 0, transparent 50%),
-                  radial-gradient(at 90% 85%, #8b5cf630 0, transparent 45%);
+      background: radial-gradient(at 15% 20%, #ef444425 0, transparent 50%),
+                  radial-gradient(at 85% 15%, #06b6d425 0, transparent 50%),
+                  radial-gradient(at 50% 85%, #eab30820 0, transparent 55%),
+                  radial-gradient(at 90% 85%, #8b5cf625 0, transparent 50%);
       filter: blur(60px);
     }
   </style>
 </head>
 <body class="bg-[#f8f9fa] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white overflow-x-hidden min-h-screen flex flex-col justify-between">
-  <div class="fixed inset-0 -z-10 mesh opacity-60 pointer-events-none"></div>
+  <div class="fixed inset-0 -z-10 mesh opacity-70 pointer-events-none"></div>
 
   <!-- Navigation -->
-  <nav class="sticky top-0 z-50 glass border-b border-zinc-200/70 px-4 md:px-8 py-3.5 transition-all">
+  <nav class="sticky top-0 z-50 glass border-b border-zinc-200/80 px-4 sm:px-6 lg:px-8 py-3 transition-all">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-zinc-900 text-white flex items-center justify-center font-extrabold shadow-md shadow-zinc-900/10 tracking-tight text-lg">
+      <!-- Brand Logo -->
+      <a href="index.html" class="flex items-center gap-2.5 sm:gap-3 group">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-zinc-900 text-white flex items-center justify-center font-extrabold shadow-md shadow-zinc-900/10 tracking-tight text-base sm:text-lg group-hover:scale-105 transition-transform">
           R
         </div>
         <div>
-          <div class="flex items-center gap-2">
-            <span class="font-extrabold text-xl tracking-tight text-zinc-900">RakshaNet</span>
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300/60">
+          <div class="flex items-center gap-1.5 sm:gap-2">
+            <span class="font-extrabold text-lg sm:text-xl tracking-tight text-zinc-950">RakshaNet</span>
+            <span class="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300/60">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span>
-              CORE v2.0
+              v2.0
             </span>
           </div>
-          <p class="text-[11px] text-zinc-500 hidden sm:block">Autonomous Civil Defense & Rapid Dispatch Mesh</p>
+          <p class="text-[10px] sm:text-[11px] text-zinc-500 hidden md:block leading-none mt-0.5">Civil Defense & Rapid Dispatch Mesh</p>
         </div>
-      </div>
+      </a>
 
-      <div class="flex items-center gap-2 md:gap-4">
-        <!-- Language Selector -->
+      <!-- Desktop & Tablet Navigation Controls -->
+      <div class="hidden md:flex items-center gap-2.5 lg:gap-3.5">
         <div class="relative">
-          <select id="langSwitcher" class="text-xs bg-white/90 border border-zinc-200 rounded-lg px-2.5 py-1.5 font-medium text-zinc-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900">
+          <select id="langSwitcher" class="text-xs bg-white/90 border border-zinc-200 rounded-xl px-2.5 py-2 font-medium text-zinc-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 cursor-pointer">
             <option value="en">English (EN)</option>
             <option value="hi">हिंदी (HI)</option>
             <option value="mr">मराठी (MR)</option>
           </select>
         </div>
 
-        <a href="citizen.html" class="px-4 py-2 text-sm font-semibold rounded-xl bg-white border border-zinc-200 text-zinc-800 hover:bg-zinc-50 shadow-sm transition">
+        <a href="citizen.html" class="px-3.5 lg:px-4 py-2 text-xs lg:text-sm font-semibold rounded-xl bg-white border border-zinc-200 text-zinc-800 hover:bg-zinc-50 shadow-sm transition">
           Citizen Portal
         </a>
-        <a href="dashboard.html" class="px-4 py-2 text-sm font-semibold rounded-xl bg-zinc-900 text-white hover:bg-black shadow-sm hover:shadow transition">
+        <a href="dashboard.html" class="px-3.5 lg:px-4 py-2 text-xs lg:text-sm font-semibold rounded-xl bg-zinc-900 text-white hover:bg-black shadow-sm hover:shadow transition">
           HQ Dashboard
         </a>
-        <a href="login.html" class="px-3 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900">
+        <a href="login.html" class="px-2.5 py-2 text-xs lg:text-sm font-medium text-zinc-600 hover:text-zinc-950 transition">
           Sign In
         </a>
       </div>
+
+      <!-- Mobile Hamburger Button -->
+      <div class="flex items-center gap-2 md:hidden">
+        <select id="langSwitcherMobile" class="text-xs bg-white border border-zinc-200 rounded-lg px-2 py-1.5 font-medium text-zinc-700">
+          <option value="en">EN</option>
+          <option value="hi">HI</option>
+          <option value="mr">MR</option>
+        </select>
+
+        <button id="mobileMenuBtn" aria-label="Toggle Menu" class="p-2 rounded-xl bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-100 transition focus:outline-none">
+          <svg id="menuIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <svg id="closeIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer / Dropdown -->
+    <div id="mobileMenu" class="hidden md:hidden pt-4 pb-2 px-1 border-t border-zinc-200/80 mt-3 space-y-2">
+      <a href="citizen.html" class="block w-full py-2.5 px-3 text-center text-sm font-semibold rounded-xl bg-white border border-zinc-200 text-zinc-800 shadow-sm active:bg-zinc-50">
+        Citizen Emergency SOS Portal
+      </a>
+      <a href="dashboard.html" class="block w-full py-2.5 px-3 text-center text-sm font-semibold rounded-xl bg-zinc-900 text-white shadow-sm active:bg-black">
+        Launch HQ Dashboard
+      </a>
+      <a href="login.html" class="block w-full py-2 px-3 text-center text-xs font-semibold text-zinc-600 active:text-zinc-950">
+        Operator Sign In →
+      </a>
     </div>
   </nav>
 
   <!-- Hero Section -->
-  <main class="max-w-7xl mx-auto px-4 md:px-8 pt-12 pb-16 w-full flex-1">
-    <div class="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 lg:pt-14 pb-12 sm:pb-16 w-full flex-1">
+    <div class="grid lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-12 items-center">
       
-      <!-- Left Column -->
-      <div class="lg:col-span-7">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-900/5 border border-zinc-200 text-zinc-800 text-xs font-semibold mb-5">
+      <!-- Left Column: Value Proposition & Stats -->
+      <div class="lg:col-span-7 flex flex-col items-start">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900/5 border border-zinc-200 text-zinc-800 text-[11px] sm:text-xs font-semibold mb-4 sm:mb-5">
           <span class="flex h-2 w-2 relative">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
           </span>
-          5 Specialized Agents • Real-Time Sensor Telemetry
+          <span>5 Specialized Agents • Real-Time Mesh Telemetry</span>
         </div>
 
-        <h1 class="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[0.95] text-zinc-950">
-          Autonomous<br>
+        <h1 class="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] sm:leading-[0.98] text-zinc-950">
+          Autonomous<br class="hidden xs:inline">
           disaster action<br>
           <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-amber-500 to-violet-600">
             in under 2 seconds.
           </span>
         </h1>
 
-        <p class="mt-6 text-lg text-zinc-600 leading-relaxed max-w-xl">
+        <p class="mt-4 sm:mt-6 text-sm sm:text-base md:text-lg text-zinc-600 leading-relaxed max-w-xl">
           Fuses telemetry from seismic gauges, hydrological monitors, and satellite heat scans. Automatically validates incidents, drafts multilingual warnings, opens shelters, and deploys rescue teams.
         </p>
 
-        <!-- Quick Launch CTA -->
-        <div class="mt-8 flex flex-wrap gap-3.5 items-center">
-          <a href="dashboard.html" class="px-6 py-3.5 rounded-2xl bg-zinc-900 text-white font-semibold hover:bg-zinc-800 transition shadow-lg shadow-zinc-900/10 flex items-center gap-2">
+        <!-- CTA Buttons -->
+        <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row w-full sm:w-auto gap-3 items-stretch sm:items-center">
+          <a href="dashboard.html" class="px-6 py-3.5 rounded-2xl bg-zinc-900 text-white text-sm font-semibold hover:bg-zinc-800 active:scale-[0.99] transition shadow-lg shadow-zinc-900/10 flex items-center justify-center gap-2 text-center">
             Launch Responder Dashboard
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
           </a>
-          <a href="citizen.html" class="px-6 py-3.5 rounded-2xl bg-white border border-zinc-300/80 text-zinc-800 font-semibold hover:bg-zinc-100 transition shadow-sm">
+          <a href="citizen.html" class="px-6 py-3.5 rounded-2xl bg-white border border-zinc-300 text-zinc-800 text-sm font-semibold hover:bg-zinc-100 active:scale-[0.99] transition shadow-sm text-center">
             Citizen Emergency SOS
           </a>
         </div>
 
         <!-- Telemetry Stats Cards -->
-        <div class="mt-10 grid grid-cols-3 gap-3.5 max-w-lg">
-          <div class="p-4 rounded-2xl bg-white/90 border border-zinc-200/80 shadow-sm backdrop-blur">
-            <div class="text-2xl font-bold text-zinc-900" id="statHazards">6</div>
-            <div class="text-xs font-medium text-zinc-500 mt-0.5">Hazards Monitored</div>
+        <div class="mt-8 sm:mt-10 grid grid-cols-3 gap-2.5 sm:gap-3.5 w-full max-w-lg">
+          <div class="p-3 sm:p-4 rounded-2xl bg-white/90 border border-zinc-200/80 shadow-sm backdrop-blur flex flex-col justify-between">
+            <div class="text-xl sm:text-2xl font-bold text-zinc-900" id="statHazards">6</div>
+            <div class="text-[10px] sm:text-xs font-medium text-zinc-500 mt-1 leading-tight">Hazards Monitored</div>
           </div>
-          <div class="p-4 rounded-2xl bg-white/90 border border-zinc-200/80 shadow-sm backdrop-blur">
-            <div class="text-2xl font-bold text-emerald-600" id="statLatency">&lt;1.8s</div>
-            <div class="text-xs font-medium text-zinc-500 mt-0.5">Pipeline Latency</div>
+          <div class="p-3 sm:p-4 rounded-2xl bg-white/90 border border-zinc-200/80 shadow-sm backdrop-blur flex flex-col justify-between">
+            <div class="text-xl sm:text-2xl font-bold text-emerald-600" id="statLatency">&lt;1.8s</div>
+            <div class="text-[10px] sm:text-xs font-medium text-zinc-500 mt-1 leading-tight">Pipeline Latency</div>
           </div>
-          <div class="p-4 rounded-2xl bg-white/90 border border-zinc-200/80 shadow-sm backdrop-blur">
-            <div class="text-2xl font-bold text-zinc-900" id="statSheltersActive">12 Active</div>
-            <div class="text-xs font-medium text-zinc-500 mt-0.5">Shelters Online</div>
+          <div class="p-3 sm:p-4 rounded-2xl bg-white/90 border border-zinc-200/80 shadow-sm backdrop-blur flex flex-col justify-between">
+            <div class="text-xl sm:text-2xl font-bold text-zinc-900" id="statSheltersActive">12 Active</div>
+            <div class="text-[10px] sm:text-xs font-medium text-zinc-500 mt-1 leading-tight">Shelters Online</div>
           </div>
         </div>
       </div>
 
       <!-- Right Column: Live Pipeline Monitor -->
-      <div class="lg:col-span-5 relative">
-        <div class="rounded-3xl bg-zinc-950 p-4 shadow-2xl border border-zinc-800 text-white relative overflow-hidden">
+      <div class="lg:col-span-5 w-full max-w-xl mx-auto lg:max-w-none relative">
+        <div class="rounded-2xl sm:rounded-3xl bg-zinc-950 p-3.5 sm:p-4 shadow-2xl border border-zinc-800 text-white relative overflow-hidden">
           
-          <!-- Terminal Header -->
-          <div class="flex items-center justify-between border-b border-zinc-800/80 pb-3 px-2">
+          <!-- Terminal Top Bar -->
+          <div class="flex items-center justify-between border-b border-zinc-800/80 pb-2.5 sm:pb-3 px-1 sm:px-2">
             <div class="flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span class="text-xs font-mono font-medium tracking-wide text-zinc-400">AGENT ORCHESTRATOR LIVE</span>
+              <span class="text-[11px] sm:text-xs font-mono font-medium tracking-wide text-zinc-400">AGENT ORCHESTRATOR LIVE</span>
             </div>
-            <span id="liveClock" class="font-mono text-xs text-zinc-400">--:--:--</span>
+            <span id="liveClock" class="font-mono text-[11px] sm:text-xs text-zinc-400">--:--:--</span>
           </div>
 
-          <!-- Active Metrics Sub-bar -->
-          <div class="grid grid-cols-2 gap-2 mt-4 text-xs font-mono">
-            <div class="bg-zinc-900/90 border border-zinc-800 rounded-xl p-3">
-              <span class="text-zinc-500 block text-[10px]">CURRENT THREAT LEVEL</span>
-              <span id="threatBadge" class="font-bold text-amber-400 text-sm">MONITORING (GREEN)</span>
+          <!-- Active Metrics Pillbox -->
+          <div class="grid grid-cols-2 gap-2 mt-3 text-xs font-mono">
+            <div class="bg-zinc-900/90 border border-zinc-800 rounded-xl p-2.5 sm:p-3">
+              <span class="text-zinc-500 block text-[9px] sm:text-[10px]">THREAT STATUS</span>
+              <span id="threatBadge" class="font-bold text-amber-400 text-xs sm:text-sm truncate block mt-0.5">MONITORING (GREEN)</span>
             </div>
-            <div class="bg-zinc-900/90 border border-zinc-800 rounded-xl p-3">
-              <span class="text-zinc-500 block text-[10px]">RESCUE UNITS READY</span>
-              <span id="statTeamsActive" class="font-bold text-blue-400 text-sm">8 Teams Standby</span>
+            <div class="bg-zinc-900/90 border border-zinc-800 rounded-xl p-2.5 sm:p-3">
+              <span class="text-zinc-500 block text-[9px] sm:text-[10px]">RESCUE UNITS</span>
+              <span id="statTeamsActive" class="font-bold text-blue-400 text-xs sm:text-sm truncate block mt-0.5">8 Teams Standby</span>
             </div>
           </div>
 
-          <!-- Real-time agent log console -->
-          <div class="mt-4 pt-2 border-t border-zinc-800/60">
+          <!-- Real-time Agent Log Console -->
+          <div class="mt-3 pt-2 border-t border-zinc-800/60">
             <div class="flex justify-between items-center mb-2 px-1">
-              <span class="text-[10px] font-mono uppercase text-zinc-500 tracking-wider">Live Agent Event Stream</span>
-              <span class="text-[10px] font-mono text-emerald-400">WS CONNECTED</span>
+              <span class="text-[9px] sm:text-[10px] font-mono uppercase text-zinc-500 tracking-wider">Live Agent Event Stream</span>
+              <span class="text-[9px] sm:text-[10px] font-mono text-emerald-400">WS CONNECTED</span>
             </div>
-            <div id="agentLogs" class="space-y-2 h-56 overflow-y-auto font-mono text-xs pr-1">
+            <div id="agentLogs" class="space-y-1.5 sm:space-y-2 h-48 sm:h-56 overflow-y-auto font-mono text-[11px] sm:text-xs pr-1 scrollbar-thin scrollbar-thumb-zinc-700">
               <div class="text-zinc-400 animate-pulse">[INIT] Synchronizing detectionAgent with telemetry feed...</div>
             </div>
           </div>
 
-          <!-- Action Simulator Bar -->
-          <div class="mt-4 pt-3 border-t border-zinc-800 flex items-center justify-between">
-            <span class="text-[11px] text-zinc-400 font-mono">Simulate Event:</span>
-            <div class="flex gap-1.5">
-              <button onclick="triggerSim('Flood')" class="px-2.5 py-1 text-[11px] rounded bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 font-mono transition">Flood</button>
-              <button onclick="triggerSim('Quake')" class="px-2.5 py-1 text-[11px] rounded bg-orange-600/30 hover:bg-orange-600/50 text-orange-300 font-mono transition">Quake</button>
-              <button onclick="triggerSim('Cyclone')" class="px-2.5 py-1 text-[11px] rounded bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 font-mono transition">Cyclone</button>
+          <!-- Interactive Trigger Controls -->
+          <div class="mt-3 pt-2.5 border-t border-zinc-800 flex flex-wrap items-center justify-between gap-2">
+            <span class="text-[10px] sm:text-[11px] text-zinc-400 font-mono">Simulate Event:</span>
+            <div class="flex flex-wrap gap-1.5">
+              <button onclick="triggerSim('Flood')" class="px-2 sm:px-2.5 py-1 text-[10px] sm:text-[11px] rounded-lg bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 font-mono border border-blue-500/20 active:scale-95 transition">Flood</button>
+              <button onclick="triggerSim('Quake')" class="px-2 sm:px-2.5 py-1 text-[10px] sm:text-[11px] rounded-lg bg-orange-600/30 hover:bg-orange-600/50 text-orange-300 font-mono border border-orange-500/20 active:scale-95 transition">Quake</button>
+              <button onclick="triggerSim('Cyclone')" class="px-2 sm:px-2.5 py-1 text-[10px] sm:text-[11px] rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 font-mono border border-purple-500/20 active:scale-95 transition">Cyclone</button>
             </div>
           </div>
         </div>
 
-        <!-- Ambient Glow -->
-        <div class="absolute -right-10 -bottom-10 w-60 h-60 rounded-full bg-violet-600/20 blur-3xl pointer-events-none"></div>
+        <!-- Ambient Glow Backing -->
+        <div class="absolute -right-8 -bottom-8 w-48 sm:w-60 h-48 sm:h-60 rounded-full bg-violet-600/20 blur-3xl pointer-events-none"></div>
       </div>
     </div>
   </main>
 
-  <!-- 5-Agent Architecture Breakdown -->
-  <section class="max-w-7xl mx-auto px-4 md:px-8 py-12 w-full">
-    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8">
+  <!-- 5-Agent Architecture Grid -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-8 gap-2">
       <div>
-        <h2 class="text-3xl font-extrabold tracking-tight text-zinc-950">5-Agent Decentralized Pipeline</h2>
-        <p class="text-sm text-zinc-500 mt-1">Autonomous orchestration modules located under <code class="bg-zinc-200 px-1.5 py-0.5 rounded text-zinc-800 text-xs font-mono">/backend/agents/</code></p>
+        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-950">5-Agent Decentralized Pipeline</h2>
+        <p class="text-xs sm:text-sm text-zinc-500 mt-1">Autonomous orchestration modules under <code class="bg-zinc-200 px-1.5 py-0.5 rounded text-zinc-800 text-[11px] sm:text-xs font-mono">/backend/agents/</code></p>
       </div>
-      <a href="dashboard.html" class="text-sm font-semibold text-zinc-900 hover:text-blue-600 inline-flex items-center gap-1 mt-3 md:mt-0">
+      <a href="dashboard.html" class="text-xs sm:text-sm font-semibold text-zinc-900 hover:text-blue-600 inline-flex items-center gap-1">
         View telemetry in dashboard <span>&rarr;</span>
       </a>
     </div>
 
-    <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    <!-- Responsive Adaptive Grid: 1 col on mobile, 2 on tablet, 3 on intermediate, 5 on desktop -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
       <!-- Agent 1 -->
-      <div class="p-5 rounded-2xl bg-white border border-zinc-200/80 shadow-sm hover:border-zinc-300 transition group">
-        <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 border border-red-200/60 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition">
-          🛰️
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200/80 shadow-sm hover:border-zinc-300 transition group flex flex-col justify-between">
+        <div>
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-red-50 text-red-600 border border-red-200/60 flex items-center justify-center font-bold text-base sm:text-lg group-hover:scale-105 transition">
+            🛰️
+          </div>
+          <h3 class="mt-3 font-bold text-zinc-900 text-sm sm:text-base">Detection Agent</h3>
+          <p class="text-[10px] sm:text-[11px] font-mono text-zinc-400 mt-0.5">detectionAgent.js</p>
+          <p class="text-xs text-zinc-600 mt-2 leading-relaxed">
+            Ingests river depth, seismic, humidity, and barometric telemetry from <code class="text-[10px] sm:text-[11px]">sensors.json</code>.
+          </p>
         </div>
-        <h3 class="mt-3.5 font-bold text-zinc-900">Detection Agent</h3>
-        <p class="text-[11px] font-mono text-zinc-400 mt-0.5">detectionAgent.js</p>
-        <p class="text-xs text-zinc-600 mt-2.5 leading-relaxed">
-          Ingests river depth, seismic, humidity, and barometric telemetry from <code class="text-[11px]">sensors.json</code>.
-        </p>
       </div>
 
       <!-- Agent 2 -->
-      <div class="p-5 rounded-2xl bg-white border border-zinc-200/80 shadow-sm hover:border-zinc-300 transition group">
-        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 border border-blue-200/60 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition">
-          🎯
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200/80 shadow-sm hover:border-zinc-300 transition group flex flex-col justify-between">
+        <div>
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-50 text-blue-600 border border-blue-200/60 flex items-center justify-center font-bold text-base sm:text-lg group-hover:scale-105 transition">
+            🎯
+          </div>
+          <h3 class="mt-3 font-bold text-zinc-900 text-sm sm:text-base">Coordination Agent</h3>
+          <p class="text-[10px] sm:text-[11px] font-mono text-zinc-400 mt-0.5">coordinationAgent.js</p>
+          <p class="text-xs text-zinc-600 mt-2 leading-relaxed">
+            Cross-verifies false positives, computes multi-hazard severity score, and registers incidents.
+          </p>
         </div>
-        <h3 class="mt-3.5 font-bold text-zinc-900">Coordination Agent</h3>
-        <p class="text-[11px] font-mono text-zinc-400 mt-0.5">coordinationAgent.js</p>
-        <p class="text-xs text-zinc-600 mt-2.5 leading-relaxed">
-          Cross-verifies false positives, computes multi-hazard severity score, and opens verified incidents.
-        </p>
       </div>
 
       <!-- Agent 3 -->
-      <div class="p-5 rounded-2xl bg-white border border-zinc-200/80 shadow-sm hover:border-zinc-300 transition group">
-        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition">
-          📢
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200/80 shadow-sm hover:border-zinc-300 transition group flex flex-col justify-between">
+        <div>
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200/60 flex items-center justify-center font-bold text-base sm:text-lg group-hover:scale-105 transition">
+            📢
+          </div>
+          <h3 class="mt-3 font-bold text-zinc-900 text-sm sm:text-base">Communication</h3>
+          <p class="text-[10px] sm:text-[11px] font-mono text-zinc-400 mt-0.5">communicationAgent.js</p>
+          <p class="text-xs text-zinc-600 mt-2 leading-relaxed">
+            Synthesizes localized warnings in English, Hindi, and Marathi via SMS and citizen alerts.
+          </p>
         </div>
-        <h3 class="mt-3.5 font-bold text-zinc-900">Communication</h3>
-        <p class="text-[11px] font-mono text-zinc-400 mt-0.5">communicationAgent.js</p>
-        <p class="text-xs text-zinc-600 mt-2.5 leading-relaxed">
-          Synthesizes localized advisory warnings across English, Hindi, and Marathi via SMS and Citizen Portal.
-        </p>
       </div>
 
       <!-- Agent 4 -->
-      <div class="p-5 rounded-2xl bg-white border border-zinc-200/80 shadow-sm hover:border-zinc-300 transition group">
-        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition">
-          🚚
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200/80 shadow-sm hover:border-zinc-300 transition group flex flex-col justify-between">
+        <div>
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center font-bold text-base sm:text-lg group-hover:scale-105 transition">
+            🚚
+          </div>
+          <h3 class="mt-3 font-bold text-zinc-900 text-sm sm:text-base">Resource Agent</h3>
+          <p class="text-[10px] sm:text-[11px] font-mono text-zinc-400 mt-0.5">resourceAgent.js</p>
+          <p class="text-xs text-zinc-600 mt-2 leading-relaxed">
+            Locates nearest safe shelters (<code class="text-[10px] sm:text-[11px]">shelters.json</code>) & manages NDRF teams (<code class="text-[10px] sm:text-[11px]">teams.json</code>).
+          </p>
         </div>
-        <h3 class="mt-3.5 font-bold text-zinc-900">Resource Agent</h3>
-        <p class="text-[11px] font-mono text-zinc-400 mt-0.5">resourceAgent.js</p>
-        <p class="text-xs text-zinc-600 mt-2.5 leading-relaxed">
-          Locates nearest safe shelters (<code class="text-[11px]">shelters.json</code>) and coordinates NDRF rescue teams (<code class="text-[11px]">teams.json</code>).
-        </p>
       </div>
 
-      <!-- Agent 5 -->
-      <div class="p-5 rounded-2xl bg-white border border-zinc-200/80 shadow-sm hover:border-zinc-300 transition group">
-        <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 border border-purple-200/60 flex items-center justify-center font-bold text-lg group-hover:scale-105 transition">
-          📊
+      <!-- Agent 5 (Adapts neatly on 2-col tablet layout) -->
+      <div class="p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200/80 shadow-sm hover:border-zinc-300 transition group flex flex-col justify-between sm:col-span-2 md:col-span-1">
+        <div>
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-purple-50 text-purple-600 border border-purple-200/60 flex items-center justify-center font-bold text-base sm:text-lg group-hover:scale-105 transition">
+            📊
+          </div>
+          <h3 class="mt-3 font-bold text-zinc-900 text-sm sm:text-base">Assessment Agent</h3>
+          <p class="text-[10px] sm:text-[11px] font-mono text-zinc-400 mt-0.5">assessmentAgent.js</p>
+          <p class="text-xs text-zinc-600 mt-2 leading-relaxed">
+            Calculates ongoing structural impact, population risk zones, and dynamic relief priority.
+          </p>
         </div>
-        <h3 class="mt-3.5 font-bold text-zinc-900">Assessment Agent</h3>
-        <p class="text-[11px] font-mono text-zinc-400 mt-0.5">assessmentAgent.js</p>
-        <p class="text-xs text-zinc-600 mt-2.5 leading-relaxed">
-          Calculates ongoing infrastructure impact, population risk vectors, and structural relief priority.
-        </p>
       </div>
     </div>
   </section>
 
-  <!-- Quick Access Footer -->
-  <footer class="border-t border-zinc-200 bg-white/70 py-8 px-4 md:px-8 mt-12">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+  <!-- Responsive Footer -->
+  <footer class="border-t border-zinc-200 bg-white/80 py-6 sm:py-8 px-4 sm:px-6 lg:px-8 mt-8 sm:mt-12">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500 text-center sm:text-left">
       <div class="flex items-center gap-2">
         <span class="font-bold text-zinc-800">RakshaNet 2026</span>
         <span>•</span>
         <span>Civil Protection Autonomous System</span>
       </div>
-      <div class="flex gap-4">
+      <div class="flex flex-wrap justify-center gap-4 sm:gap-6 font-medium">
         <a href="citizen.html" class="hover:text-zinc-900 transition">Citizen Portal</a>
         <a href="dashboard.html" class="hover:text-zinc-900 transition">HQ Incident Control</a>
         <a href="login.html" class="hover:text-zinc-900 transition">Operator Login</a>
@@ -266,9 +309,24 @@
     </div>
   </footer>
 
-  <!-- Dynamic Logic & Backend Interop -->
+  <!-- Scripts & Interaction -->
   <script src="i18n.js"></script>
   <script>
+    // Mobile Hamburger Menu Toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
+
+    if (mobileMenuBtn) {
+      mobileMenuBtn.addEventListener('click', () => {
+        const isClosed = mobileMenu.classList.contains('hidden');
+        mobileMenu.classList.toggle('hidden', !isClosed);
+        menuIcon.classList.toggle('hidden', isClosed);
+        closeIcon.classList.toggle('hidden', !isClosed);
+      });
+    }
+
     // Live Clock
     const liveClockEl = document.getElementById('liveClock');
     setInterval(() => {
@@ -276,20 +334,30 @@
     }, 1000);
     liveClockEl.textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
 
-    // Multi-Language Switcher Hook
+    // Multi-Language Switchers (Desktop & Mobile Sync)
     const langSwitcher = document.getElementById('langSwitcher');
-    if (langSwitcher && window.RakshaNetI18n) {
-      langSwitcher.value = localStorage.getItem('rakshanet_lang') || 'en';
-      langSwitcher.addEventListener('change', (e) => {
-        const selected = e.target.value;
-        localStorage.setItem('rakshanet_lang', selected);
-        if (typeof window.setLanguage === 'function') {
-          window.setLanguage(selected);
-        }
-      });
+    const langSwitcherMobile = document.getElementById('langSwitcherMobile');
+
+    function syncLanguage(code) {
+      localStorage.setItem('rakshanet_lang', code);
+      if (langSwitcher) langSwitcher.value = code;
+      if (langSwitcherMobile) langSwitcherMobile.value = code;
+      if (typeof window.setLanguage === 'function') {
+        window.setLanguage(code);
+      }
     }
 
-    // Backend Statistics Fetch with Resilient Fallback
+    const savedLang = localStorage.getItem('rakshanet_lang') || 'en';
+    syncLanguage(savedLang);
+
+    if (langSwitcher) {
+      langSwitcher.addEventListener('change', (e) => syncLanguage(e.target.value));
+    }
+    if (langSwitcherMobile) {
+      langSwitcherMobile.addEventListener('change', (e) => syncLanguage(e.target.value));
+    }
+
+    // Backend Statistics Fetch with Graceful Local Fallback
     async function loadTelemetry() {
       try {
         const res = await fetch('/api/stats');
@@ -303,8 +371,7 @@
           document.getElementById('statTeamsActive').textContent = `${data.teamsReady} Teams Standby`;
         }
       } catch (err) {
-        // Graceful fallback to cached structure from shelters.json & teams.json
-        console.info('Backend /api/stats disconnected. Running in client fallback mode.');
+        console.info('Running in offline/fallback telemetry display.');
       }
     }
     loadTelemetry();
@@ -314,9 +381,9 @@
     const threatBadge = document.getElementById('threatBadge');
     
     const standardCycles = [
-      { agent: 'DETECTION', msg: 'Hydrological gauge #4: Mithi River level nominal (1.8m)', col: 'text-zinc-400' },
+      { agent: 'DETECTION', msg: 'Hydrological gauge #4: Mithi River nominal (1.8m)', col: 'text-zinc-400' },
       { agent: 'RESOURCE', msg: 'Verification ping: 12 designated shelters ready', col: 'text-zinc-400' },
-      { agent: 'DETECTION', msg: 'Seismic monitoring station 14 reporting 0.02g peak ground acc.', col: 'text-zinc-400' },
+      { agent: 'DETECTION', msg: 'Seismic monitor station 14: 0.02g ground acc.', col: 'text-zinc-400' },
       { agent: 'COORDINATION', msg: 'Health check OK: 5 agents active in state engine', col: 'text-emerald-400' },
       { agent: 'COMMUNICATION', msg: 'Telemetry heartbeat sent to citizen push gateway', col: 'text-zinc-400' }
     ];
@@ -326,7 +393,7 @@
       const item = standardCycles[cycleIndex % standardCycles.length];
       appendLog(item.agent, item.msg, item.col);
       cycleIndex++;
-    }, 2800);
+    }, 3000);
 
     function appendLog(agent, text, colorClass = 'text-zinc-300') {
       const time = new Date().toLocaleTimeString('en-US', { hour12: false });
@@ -343,25 +410,25 @@
     // Interactive Trigger from Hero UI
     window.triggerSim = function(hazardType) {
       threatBadge.textContent = `ALERT: ${hazardType.toUpperCase()} (P1)`;
-      threatBadge.className = 'font-bold text-red-500 text-sm animate-pulse';
+      threatBadge.className = 'font-bold text-red-500 text-xs sm:text-sm animate-pulse truncate block mt-0.5';
 
-      appendLog('DETECTION', `⚠️ THRESHOLD BREACH: Critical ${hazardType} vector registered!`, 'text-red-400');
+      appendLog('DETECTION', `⚠️ THRESHOLD BREACH: Critical ${hazardType} registered!`, 'text-red-400');
       
       setTimeout(() => {
-        appendLog('COORDINATION', `Severity computed: P1 CRITICAL. Escalating to incident cluster #RK-${Math.floor(1000 + Math.random() * 9000)}`, 'text-amber-400');
-      }, 400);
+        appendLog('COORDINATION', `Severity P1 computed. Created incident #RK-${Math.floor(1000 + Math.random() * 9000)}`, 'text-amber-400');
+      }, 350);
 
       setTimeout(() => {
-        appendLog('COMMUNICATION', `Multilingual sirens & cell-broadcast broadcasted: EN, HI, MR`, 'text-blue-400');
-      }, 900);
+        appendLog('COMMUNICATION', `Multilingual sirens dispatched: EN, HI, MR`, 'text-blue-400');
+      }, 750);
 
       setTimeout(() => {
-        appendLog('RESOURCE', `Shelters 01, 04, 07 unsealed. 3 NDRF rescue teams dispatched.`, 'text-emerald-400');
-      }, 1400);
+        appendLog('RESOURCE', `Shelters unsealed. 3 NDRF teams dispatched.`, 'text-emerald-400');
+      }, 1200);
 
       setTimeout(() => {
-        appendLog('ASSESSMENT', `Structural risk model initialized. Safe transit corridors mapped.`, 'text-purple-400');
-      }, 1900);
+        appendLog('ASSESSMENT', `Structural damage model live. Evacuation routing set.`, 'text-purple-400');
+      }, 1650);
     };
   </script>
 </body>
