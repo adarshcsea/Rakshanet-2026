@@ -62,7 +62,11 @@ const alerts =
   
   alerts.forEach(a=>state.alerts.unshift(a));
   io && io.emit('alerts:new', alerts);
-  log('COMMUNICATION', `Multilingual alerts broadcast in 3 languages via App/SMS/Siren`, alerts);
+  log(
+  'COMMUNICATION',
+  `Multilingual alert package generated in ${alerts.length} languages`,
+  alerts
+);
 
   // 4 Resource
   await new Promise(r=>setTimeout(r,700));
